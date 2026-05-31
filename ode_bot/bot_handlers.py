@@ -408,7 +408,7 @@ def set_bonus_handler(message: telebot.types.Message) -> None:
     try:
         hour, minute = map(int, post_time.split(":"))
     except ValueError:
-        bot.reply_to(message, "❌ فرمت زمان نامعتبر است. از HH:MM استفاده کنید.")
+        bot.reply_to(message, "❌ Invalid time format. Use HH:MM.")
         return
 
     now = get_now()
@@ -426,7 +426,11 @@ def set_bonus_handler(message: telebot.types.Message) -> None:
     conn.close()
 
     scheduled_text = to_persian_num(scheduled.strftime("%Y-%m-%d %H:%M"))
-    bot.reply_to(message, f"✅ سوال برای زمان `{scheduled_text}` تنظیم شد.", parse_mode="Markdown")
+    bot.reply_to(
+        message,
+        f"✅ Bonus question scheduled for `{scheduled_text}`.",
+        parse_mode="Markdown",
+    )
 
 
 def check_bonus_posting() -> None:
@@ -534,7 +538,7 @@ def process_bonus_submission(message: telebot.types.Message, bonus_id: str) -> N
     forwarded = bot.forward_message(ta_group_id, message.chat.id, message.message_id)
     bot.send_message(
         ta_group_id,
-        f"📥 پاسخ از: {student_name}",
+        f"📥 Submission from: {student_name}",
         reply_markup=markup,
         reply_to_message_id=forwarded.message_id,
     )
@@ -630,7 +634,10 @@ def ta_approve(call: telebot.types.CallbackQuery) -> None:
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
     except ApiTelegramException:
         pass
-    bot.send_message(call.message.chat.id, f"✅ تایید شد شماره {to_persian_num(order_num)}: {first_name}")
+    bot.send_message(
+        call.message.chat.id,
+        f"✅ Approved #{to_persian_num(order_num)}: {first_name}",
+    )
 
     if order_num >= limit:
         finish_bonus(bonus_id)
